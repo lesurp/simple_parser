@@ -3,16 +3,21 @@
 
 use log::debug;
 use std::{collections::HashMap, fmt::Debug};
+use thiserror::Error;
 
 #[macro_use]
 pub mod primitives;
 #[macro_use]
 pub mod grammar;
 
-#[derive(Debug, Clone)]
+#[cfg(test)]
+mod test;
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum Node<'a> {
     LiteralStr(&'a str),
-    LiteralUnsigned(usize),
+    LiteralUnsigned(u64),
+    LiteralSigned(i64),
     LiteralFloat(f64),
     Token(&'a str),
     Expr(Vec<Node<'a>>),
@@ -51,7 +56,7 @@ impl<'a> From<Rule<'a>> for AlternativeRules<'a> {
 pub struct Parser<'a>(HashMap<ParseKey<'a>, AlternativeRules<'a>>);
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, PartialOrd)]
-pub struct ParseKey<'a>(pub &'a str);
+pub struct ParseKey<'a>(&'a str);
 
 impl<'a> Parser<'a> {
     pub fn new(rule_map: HashMap<ParseKey<'a>, AlternativeRules<'a>>) -> Parser {
@@ -66,24 +71,25 @@ impl<'a> Parser<'a> {
                 .count()
     }
 
-    pub fn parse(&'a self, key: &'a str, expr: &'a str) -> ParseResult<'a> {
+    pub fn parse(&'a self, key: &'a str, expr: &'a str) -> Result<Node<'a>, ParseError> {
         debug!("Parsing expression: '{}'", expr);
-        if expr.is_empty() {
-            debug!("Is empty, return EOF");
-            return ParseResult::EoF;
-        }
-
         let offset = Parser::trim(expr, 0);
 
         if expr[offset..].is_empty() {
             debug!("Is empty after trimming, return EmptyLine");
-            return ParseResult::EmptyLine;
+            return Err(ParseError::EmptyInput);
         }
 
         ParseKey(key)
             .unify_key_move(self, expr, offset)
-            .map(|(node, _)| ParseResult::OK(node))
-            .unwrap_or(ParseResult::Err)
+            .map(|(node, offset)| {
+                if offset != expr.len() {
+                    Err(ParseError::Trailingcharacters(offset))
+                } else {
+                    Ok(node)
+                }
+            })
+            .unwrap_or(Err(ParseError::NoRuleMatched))
     }
 }
 
@@ -159,12 +165,14 @@ impl<'a> ParseKey<'a> {
     }
 }
 
-#[derive(Clone, Debug)]
-pub enum ParseResult<'a> {
-    EmptyLine,
-    EoF,
-    OK(Node<'a>),
-    Err,
+#[derive(Clone, Debug, Error)]
+pub enum ParseError {
+    #[error("Input is empty (or only contains whitespaces")]
+    EmptyInput,
+    #[error("Parsing stopped at character {0}, but trailing characters still exist")]
+    Trailingcharacters(usize),
+    #[error("No rule matched the given input")]
+    NoRuleMatched,
 }
 
 pub fn parse_token<const TOKEN: &'static str>(

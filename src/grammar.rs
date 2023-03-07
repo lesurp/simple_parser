@@ -9,7 +9,7 @@ macro_rules! grammar {
                     let rule_set = _rule_set!($rule_set);
                     alternative_rules.push(rule_set);
                 )*
-                rule_map.insert(crate::parser::ParseKey(stringify!($key)), alternative_rules);
+                rule_map.insert($crate::ParseKey(stringify!($key)), alternative_rules);
             )*
                 rule_map
         }
@@ -22,28 +22,28 @@ macro_rules! _rule_set {
         _rule_set!($($tokens)*)
     };
     ($t:literal, $($tail:tt)*) => {{
-        let mut rule_set: parser::RuleSet = Vec::new();
+        let mut rule_set: $crate::RuleSet = Vec::new();
         rule_set.extend(_rule_set!($t));
         rule_set.extend(_rule_set!($($tail)*));
         rule_set
     }};
     ($t:ident, $($tail:tt)*) => {{
-        let mut rule_set: parser::RuleSet = Vec::new();
+        let mut rule_set: $crate::RuleSet = Vec::new();
         rule_set.extend(_rule_set!($t));
         rule_set.extend(_rule_set!($($tail)*));
         rule_set
     }};
     ($t:expr, $($tail:tt)*) => {{
-        let mut rule_set: parser::RuleSet = Vec::new();
+        let mut rule_set: $crate::RuleSet = Vec::new();
         rule_set.extend(_rule_set!($t));
         rule_set.extend(_rule_set!($($tail)*));
         rule_set
     }};
     ($rule:literal) => {
-        vec![parser::Rule::Terminal(Box::new(parse_token::<$rule>))]
+        vec![$crate::Rule::Terminal(Box::new(parse_token::<$rule>))]
     };
     ($rule:ident) => {
-        vec![parser::Rule::NonTerminal(parser::ParseKey(stringify!($rule)))]
+        vec![$crate::Rule::NonTerminal($crate::ParseKey(stringify!($rule)))]
     };
     ($rule:expr) => {
         vec![$rule]
