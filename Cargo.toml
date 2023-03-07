@@ -7,6 +7,6 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-log = "0.4.17"
-regex = "1.7.1"
-thiserror = "1.0.39"
+log = "0.4"
+regex = "1.7"
+thiserror = "1.0"
