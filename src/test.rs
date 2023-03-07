@@ -7,7 +7,7 @@ fn math_expression_parsing() -> Parser<'static> {
         fact => { number | ["(", expr, ")"] },
         add_op => { "+" | "-" },
         mul_op => { "*" | "/" },
-        number => {[signed!()]},
+        number => { [signed!()] },
     };
 
     Parser::new(rule_map)

@@ -11,7 +11,7 @@ macro_rules! grammar {
                 )*
                 rule_map.insert($crate::ParseKey(stringify!($key)), alternative_rules);
             )*
-                rule_map
+            rule_map
         }
     };
 }
