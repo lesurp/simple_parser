@@ -37,7 +37,7 @@ macro_rules! grammar {
         rule_set
     }};
     (@ $rule:literal) => {
-        vec![$crate::Rule::Terminal(Box::new(parse_token::<$rule>))]
+        vec![$crate::Rule::Terminal(Box::new($crate::primitives::parse_token::<$rule>))]
     };
     (@ $rule:ident) => {
         vec![$crate::Rule::NonTerminal($crate::ParseKey(stringify!($rule)))]

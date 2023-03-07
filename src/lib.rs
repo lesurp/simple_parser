@@ -174,17 +174,3 @@ pub enum ParseError {
     #[error("No rule matched the given input")]
     NoRuleMatched,
 }
-
-pub fn parse_token<const TOKEN: &'static str>(
-    expr: &str,
-    offset: usize,
-) -> Option<(Node<'_>, usize)> {
-    debug!("Parsing token '{}' from input '{}'", TOKEN, &expr[offset..]);
-    if expr[offset..].starts_with(TOKEN) {
-        debug!("\tOK");
-        Some((Node::Token(TOKEN), offset + TOKEN.len()))
-    } else {
-        debug!("\tErr");
-        None
-    }
-}

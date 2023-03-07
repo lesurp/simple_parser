@@ -2,6 +2,20 @@ use crate::Node;
 use log::debug;
 use regex::Regex;
 
+pub fn parse_token<const TOKEN: &'static str>(
+    expr: &str,
+    offset: usize,
+) -> Option<(Node<'_>, usize)> {
+    debug!("Parsing token '{}' from input '{}'", TOKEN, &expr[offset..]);
+    if expr[offset..].starts_with(TOKEN) {
+        debug!("\tOK");
+        Some((Node::Token(TOKEN), offset + TOKEN.len()))
+    } else {
+        debug!("\tErr");
+        None
+    }
+}
+
 pub fn parse_word(expr: &str, offset: usize) -> Option<(Node<'_>, usize)> {
     debug!("Parsing word from input '{}'", &expr[offset..]);
     let new_offset = offset
