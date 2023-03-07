@@ -2,7 +2,7 @@
 macro_rules! grammar {
     ($($key:ident => { $($rule_set:tt)|* $(|)? }),* $(,)?) => {
         {
-            let mut rule_map = std::collections::HashMap::<ParseKey, AlternativeRules>::new();
+            let mut rule_map = std::collections::HashMap::<$crate::ParseKey, $crate::AlternativeRules>::new();
             $(
                 let mut alternative_rules = Vec::new();
                 $(
