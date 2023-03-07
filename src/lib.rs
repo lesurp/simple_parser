@@ -56,7 +56,7 @@ impl<'a> From<Rule<'a>> for AlternativeRules<'a> {
 pub struct Parser<'a>(HashMap<ParseKey<'a>, AlternativeRules<'a>>);
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq, PartialOrd)]
-pub struct ParseKey<'a>(&'a str);
+pub struct ParseKey<'a>(pub &'a str);
 
 impl<'a> Parser<'a> {
     pub fn new(rule_map: HashMap<ParseKey<'a>, AlternativeRules<'a>>) -> Parser {
